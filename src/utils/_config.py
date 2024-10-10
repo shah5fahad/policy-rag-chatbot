@@ -21,3 +21,11 @@ if not os.getenv("OPENAI_API_KEY"):
 if not os.getenv("SCHEDULER_INTERVAL"):
     logger.error("SCHEDULER_INTERVAL environment not set.")
     raise ValueError("SCHEDULER_INTERVAL environment not set.")
+
+if not os.getenv("PINECONE_API_KEY"):
+    logger.error("PINECONE_API_KEY environment not set.")
+    raise ValueError("PINECONE_API_KEY environment not set.")
+
+if not os.getenv("PINECONE_INDEX_NAME"):
+    logger.error("PINECONE_INDEX_NAME environment not set.")
+    raise ValueError("PINECONE_INDEX_NAME environment not set.")
