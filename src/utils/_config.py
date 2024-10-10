@@ -3,7 +3,10 @@ import os
 from dotenv import load_dotenv
 from loguru import logger
 
-load_dotenv()
+if os.getenv('PYTHON_ENV') == 'test':
+    load_dotenv(dotenv_path='.env.test', override=True)
+else:
+    load_dotenv()
 
 
 LOG_FILE = os.getenv("LOG_FILE")
