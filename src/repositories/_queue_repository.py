@@ -1,3 +1,4 @@
+import re
 from sqlalchemy import select
 
 from src.models import FileQueue
@@ -10,15 +11,16 @@ class FileQueueRepository(BaseRepository):
         super().__init__(model=FileQueue)
 
     async def get_oldest_queue_with_status(self, status: str, limit: int = 1):
-        query = (
-            select(FileQueue)
-            .where(FileQueue.status == status)
-            .order_by(FileQueue.created_at.desc())
-            .limit(limit)
-        )
-        result = await self.execute(query)
-        result = result.scalar()
-        return result
+        async with self.get_session() as session:
+            query = (
+                select(FileQueue)
+                .where(FileQueue.status == status)
+                .order_by(FileQueue.created_at.asc())
+                .limit(limit)
+            )
+            result = await session.execute(query)
+            result = result.scalar()
+            return result
 
     async def bulk_update_status(self, existing_status: str, new_status: str):
         async with self.get_session() as session:
