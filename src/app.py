@@ -23,7 +23,7 @@ async def scheduled_job():
         async with FileQueueProcessor() as processor:
             await processor.process()
     except Exception as e:
-        logger.error(e)
+        logger.exception(e)
 
 
 def run_upgrade(connection, alembic_config: Config):
