@@ -1,4 +1,3 @@
-import re
 from sqlalchemy import select
 
 from src.models import FileQueue

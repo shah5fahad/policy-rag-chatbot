@@ -1,29 +1,37 @@
 import os
+import threading
 from contextlib import asynccontextmanager
 
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 
 class DatabaseConfig:
+    _thread_local = threading.local()
+
     @classmethod
-    def async_engine(cls):
-        return create_async_engine(
-            os.getenv("SQLALCHEMY_DATABASE_URI"), pool_pre_ping=True, pool_recycle=3600
-        )
+    def get_engine(cls):
+        if not hasattr(cls._thread_local, "engine"):
+            cls._thread_local.engine = create_async_engine(
+                url=os.getenv("SQLALCHEMY_DATABASE_URI"),
+                pool_pre_ping=True,
+                pool_recycle=3600,
+            )
+        return cls._thread_local.engine
+
+    @classmethod
+    def _get_session_factory(cls):
+        if not hasattr(cls._thread_local, "session_factory"):
+            cls._thread_local.session_factory = async_sessionmaker(
+                bind=cls.get_engine(),
+                autoflush=False,
+                autocommit=False,
+                expire_on_commit=False,
+            )
+        return cls._thread_local.session_factory
 
     @classmethod
     @asynccontextmanager
     async def async_session(cls):
-        engine = cls.async_engine()
-        session_factory = async_sessionmaker(
-            bind=engine,
-            autoflush=False,
-            autocommit=False,
-            expire_on_commit=False,
-        )
-        session = session_factory()
-        try:
+        session_factory = cls._get_session_factory()
+        async with session_factory() as session:
             yield session
-        finally:
-            await session.close()
-            await engine.dispose()

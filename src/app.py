@@ -9,9 +9,8 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.config import logger
+from src.config import DatabaseConfig, logger
 from src.controllers import api_router
-from src.repositories import DatabaseConfig
 from src.tasks import FileQueueProcessor
 
 scheduler = AsyncIOScheduler()
@@ -37,7 +36,7 @@ async def run_migrations():
     alembic_config.set_main_option(
         "sqlalchemy.url", os.getenv("SQLALCHEMY_DATABASE_URI")
     )
-    async with DatabaseConfig.async_engine().begin() as session:
+    async with DatabaseConfig.get_engine().begin() as session:
         await session.run_sync(run_upgrade, alembic_config)
 
 
