@@ -1,13 +1,10 @@
-import os
-
-from src.utils import logger
-
-from langchain_pinecone import PineconeVectorStore
-from langchain_openai import OpenAIEmbeddings
-from pinecone import Pinecone
-
 import asyncio
+import os
 from concurrent.futures import ThreadPoolExecutor
+
+from langchain_openai import OpenAIEmbeddings
+from langchain_pinecone import PineconeVectorStore
+from pinecone import Pinecone
 
 
 class PineconeClient:
@@ -28,9 +25,7 @@ class PineconeClient:
         pass
 
     async def insert_data(self, text: list[str], metadata: list[dict]):
-        return await self.vector_store.aadd_texts(
-            texts=text, metadatas=metadata
-        )
+        return await self.vector_store.aadd_texts(texts=text, metadatas=metadata)
 
     async def similarity_search(self, query: str, top_k: int = 5):
         return await self.vector_store.asimilarity_search_with_score(

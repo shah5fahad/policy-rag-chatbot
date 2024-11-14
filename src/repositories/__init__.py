@@ -1,5 +1,5 @@
 from ._base_repository import BaseRepository
-from ._config import DatabaseConfig
+from ..config._database_config import DatabaseConfig
 from ._queue_repository import FileQueueRepository
 
 __all__ = ["DatabaseConfig", "BaseRepository", "FileQueueRepository"]

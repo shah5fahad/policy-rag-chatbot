@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from sqlalchemy.future import select
 
-from ._config import DatabaseConfig
+from src.config import DatabaseConfig
 
 
 class BaseRepository:

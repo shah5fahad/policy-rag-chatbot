@@ -1,11 +1,10 @@
 import json
 import tempfile
 
+from src.config import logger
 from src.models import FileQueue, FileQueueStatus
 from src.repositories import FileQueueRepository
-
-from ._config import logger
-from ._openai_client import OpenAIClient
+from src.utils import OpenAIClient
 
 
 class FileQueueProcessor:
@@ -73,12 +72,6 @@ class FileQueueProcessor:
                 )
             logger.info(f"Processed file: {oldest_queue.s3_folder_name}")
         except Exception as e:
-            logger.error(f"Error processing file: {e}")
-            email_body = f"""Filename: {oldest_queue.s3_folder_name}\nUploaded At: {oldest_queue.created_at}\nError: {e}"""
-            await self.file_queue_repository.patch(
-                id=oldest_queue.id,
-                status=FileQueueStatus.FAILED,
-                details=f"Error processing file: {e}",
-            )
+            logger.exception(f"Error processing file: {e}")
         finally:
             pass

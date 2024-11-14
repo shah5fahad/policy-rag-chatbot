@@ -9,9 +9,10 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.config import logger
 from src.controllers import api_router
 from src.repositories import DatabaseConfig
-from src.utils import FileQueueProcessor, logger
+from src.tasks import FileQueueProcessor
 
 scheduler = AsyncIOScheduler()
 
