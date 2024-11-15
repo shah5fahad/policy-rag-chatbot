@@ -3,11 +3,17 @@ import os
 from dotenv import load_dotenv
 
 from .app import app
+from .config import logger
 
 if os.getenv("PYTHON_ENV") == "test":
     load_dotenv(dotenv_path=".env.test", override=True)
 else:
     load_dotenv()
+
+if not os.getenv("CORS_ALLOW_ORIGINS"):
+    logger.warning(
+        "CORS_ALLOW_ORIGINS environment not set. Allowing localhost by default."
+    )
 
 if not os.getenv("SQLALCHEMY_DATABASE_URI"):
     raise ValueError("SQLALCHEMY_DATABASE_URI environment not set.")
