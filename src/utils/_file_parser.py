@@ -1,0 +1,118 @@
+from llama_index.core import SimpleDirectoryReader
+from llama_index.core.schema import Document
+from llama_parse import LlamaParse
+
+
+class FileParser:
+    def __init__(self):
+        self.parser = LlamaParse(
+            result_type="markdown",
+            auto_mode=True,
+            auto_mode_trigger_on_image_in_page=True,
+            auto_mode_trigger_on_table_in_page=True,
+        )
+        self.file_extractor = {
+            # Base types
+            ".pdf": self.parser,
+            # Documents and presentations
+            ".abw": self.parser,
+            ".cgm": self.parser,
+            ".cwk": self.parser,
+            ".doc": self.parser,
+            ".docx": self.parser,
+            ".docm": self.parser,
+            ".dot": self.parser,
+            ".dotm": self.parser,
+            ".hwp": self.parser,
+            ".key": self.parser,
+            ".lwp": self.parser,
+            ".mw": self.parser,
+            ".mcw": self.parser,
+            ".pages": self.parser,
+            ".pbd": self.parser,
+            ".ppt": self.parser,
+            ".pptm": self.parser,
+            ".pptx": self.parser,
+            ".pot": self.parser,
+            ".potm": self.parser,
+            ".potx": self.parser,
+            ".rtf": self.parser,
+            ".sda": self.parser,
+            ".sdd": self.parser,
+            ".sdp": self.parser,
+            ".sdw": self.parser,
+            ".sgl": self.parser,
+            ".sti": self.parser,
+            ".sxi": self.parser,
+            ".sxw": self.parser,
+            ".stw": self.parser,
+            ".sxg": self.parser,
+            ".uof": self.parser,
+            ".uop": self.parser,
+            ".uot": self.parser,
+            ".vor": self.parser,
+            ".wpd": self.parser,
+            ".wps": self.parser,
+            ".xml": self.parser,
+            ".zabw": self.parser,
+            ".epub": self.parser,
+            # Images
+            ".jpg": self.parser,
+            ".jpeg": self.parser,
+            ".png": self.parser,
+            ".gif": self.parser,
+            ".bmp": self.parser,
+            ".svg": self.parser,
+            ".tiff": self.parser,
+            ".webp": self.parser,
+            ".web": self.parser,
+            ".htm": self.parser,
+            ".html": self.parser,
+            # Spreadsheets
+            ".xlsx": self.parser,
+            ".xls": self.parser,
+            ".xlsm": self.parser,
+            ".xlsb": self.parser,
+            ".xlw": self.parser,
+            ".csv": self.parser,
+            ".dif": self.parser,
+            ".sylk": self.parser,
+            ".slk": self.parser,
+            ".prn": self.parser,
+            ".numbers": self.parser,
+            ".et": self.parser,
+            ".ods": self.parser,
+            ".fods": self.parser,
+            ".uos1": self.parser,
+            ".uos2": self.parser,
+            ".dbf": self.parser,
+            ".wk1": self.parser,
+            ".wk2": self.parser,
+            ".wk3": self.parser,
+            ".wk4": self.parser,
+            ".wks": self.parser,
+            ".123": self.parser,
+            ".wq1": self.parser,
+            ".wq2": self.parser,
+            ".wb1": self.parser,
+            ".wb2": self.parser,
+            ".wb3": self.parser,
+            ".qpw": self.parser,
+            ".xlr": self.parser,
+            ".eth": self.parser,
+            ".tsv": self.parser,
+            # Audio
+            ".mp3": self.parser,
+            ".mp4": self.parser,
+            ".mpeg": self.parser,
+            ".mpga": self.parser,
+            ".m4a": self.parser,
+            ".wav": self.parser,
+            ".webm": self.parser,
+        }
+
+    async def parse(self, input_dir: str):
+        documents: list[Document] = await SimpleDirectoryReader(
+            input_dir=input_dir, file_extractor=self.file_extractor
+        ).aload_data()
+        return "\n".join([doc.text for doc in documents])
