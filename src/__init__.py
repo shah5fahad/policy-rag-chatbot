@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 
 from .app import app
-from .config import logger
+from loguru import logger
 
 if os.getenv("PYTHON_ENV") == "test":
     load_dotenv(dotenv_path=".env.test", override=True)

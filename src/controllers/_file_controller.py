@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, UploadFile
+from loguru import logger
 
-from src.config import logger
 from src.services import FileService
 
 

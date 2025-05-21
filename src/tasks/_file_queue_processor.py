@@ -1,4 +1,5 @@
-from src.config import logger
+from loguru import logger
+
 from src.models import FileQueue, FileQueueStatus
 from src.repositories import FileQueueRepository
 

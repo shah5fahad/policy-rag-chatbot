@@ -8,8 +8,9 @@ from alembic.config import Config
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from loguru import logger
 
-from src.config import DatabaseConfig, logger
+from src.config import DatabaseConfig
 from src.controllers import api_router
 from src.tasks import FileQueueProcessor
 
