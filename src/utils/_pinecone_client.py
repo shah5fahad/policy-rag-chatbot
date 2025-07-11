@@ -1,21 +1,22 @@
 import asyncio
-import os
 from concurrent.futures import ThreadPoolExecutor
 
 from langchain_openai import OpenAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone
 
+from src.configs import EnvConfig
+
 
 class PineconeClient:
     def __init__(self):
         self.pc = Pinecone(
-            api_key=os.getenv("PINECONE_API_KEY"),
+            api_key=EnvConfig.PINECONE_API_KEY,
         )
-        self.embeddings = OpenAIEmbeddings(openai_api_key=os.getenv("OPENAI_API_KEY"))
+        self.embeddings = OpenAIEmbeddings(openai_api_key=EnvConfig.OPENAI_API_KEY)
 
     async def __aenter__(self):
-        self.index = self.pc.Index(os.getenv("PINECONE_INDEX_NAME"))
+        self.index = self.pc.Index(EnvConfig.PINECONE_INDEX_NAME)
         self.vector_store = PineconeVectorStore(
             index=self.index, embedding=self.embeddings
         )

@@ -9,6 +9,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
+import sqlmodel
 ${imports if imports else ""}
 
 # revision identifiers, used by Alembic.
@@ -18,9 +19,9 @@ branch_labels: Union[str, Sequence[str], None] = ${repr(branch_labels)}
 depends_on: Union[str, Sequence[str], None] = ${repr(depends_on)}
 
 
-def upgrade() -> None:
+def upgrade():
     ${upgrades if upgrades else "pass"}
 
 
-def downgrade() -> None:
+def downgrade():
     ${downgrades if downgrades else "pass"}

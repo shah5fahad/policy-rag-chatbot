@@ -1,4 +1,4 @@
-FROM python:3.12
+FROM python:3.13-slim
 
 WORKDIR /app
 
@@ -18,12 +18,10 @@ USER user
 
 COPY --chown=user alembic.ini /app/
 
-COPY --chown=user migrations /app/migrations
-
 COPY --chown=user src /app/src
 
-EXPOSE 8000
+EXPOSE 7860
 
 ENV PYTHONUNBUFFERED=1
 
-CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "7860"]

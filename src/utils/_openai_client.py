@@ -1,7 +1,8 @@
 import json
-import os
 
 from openai import AsyncOpenAI
+
+from src.configs import EnvConfig
 
 TOOLS = [
     {
@@ -24,9 +25,10 @@ TOOLS = [
 ]
 
 
-AVAILABLE_FUNCTIONS = {
-    "file_search": file_search,
-}
+# AVAILABLE_FUNCTIONS = {
+#     "file_search": file_search,  # TODO: Implement file_search function
+# }
+AVAILABLE_FUNCTIONS = {}
 
 
 class OpenAIClient:
@@ -34,7 +36,7 @@ class OpenAIClient:
         self, model: str = "gpt-4o-2024-08-06", timeout: int = 300, max_retries: int = 5
     ):
         self._client = AsyncOpenAI(
-            api_key=os.getenv("OPENAI_API_KEY"),
+            api_key=EnvConfig.OPENAI_API_KEY,
             timeout=timeout,
             max_retries=max_retries,
         )

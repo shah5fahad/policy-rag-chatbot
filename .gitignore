@@ -137,4 +137,10 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+# Formatter cache files
+.mypy_cache/
+.black_cache/
+.ruff_cache/
+
 .vscode
+*.db
