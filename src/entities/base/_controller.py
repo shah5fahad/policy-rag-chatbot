@@ -1,21 +1,22 @@
-from typing import Any, Dict, List, Optional, Type, TypeVar
+from typing import Any, Generic, List, Optional, Type, TypeVar
 
 import sqlalchemy.exc
 from fastapi import APIRouter, Body, HTTPException, Query, Request
-from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from loguru import logger
 
-from ._repository import ModelT
+from ._schema import BaseSchema
 from ._service import BaseService
 
 ServiceT = TypeVar("ServiceT", bound=BaseService)
+SchemaT = TypeVar("SchemaT", bound=BaseSchema)
 
 
-class BaseController:
-    def __init__(self, service: Type[ServiceT]):
+class BaseController(Generic[SchemaT]):
+    def __init__(self, service: Type[ServiceT], schema: Type[SchemaT]):
         self.router = APIRouter()
         self.service = service()
+        self.schema = schema
 
         self.router.post("/")(self.create)
         self.router.put("/")(self.upsert)
@@ -24,16 +25,11 @@ class BaseController:
         self.router.patch("/{id}")(self.patch)
         self.router.delete("/{id}")(self.delete)
 
-    async def create(self, object: ModelT = Body(...)):
+    async def create(self, object: SchemaT = Body(...)):
         try:
-            if not object.model_dump(
-                exclude_unset=True, exclude_defaults=True, exclude_none=True
-            ):
-                raise HTTPException(
-                    status_code=400, detail="Request body cannot be empty"
-                )
-            result = await self.service.create(object=object)
-            return JSONResponse(jsonable_encoder(result), status_code=201)
+            validated_object = self.schema(**object)
+            result = await self.service.create(object=validated_object)
+            return JSONResponse(result, status_code=201)
         except sqlalchemy.exc.SQLAlchemyError as e:
             raise HTTPException(
                 status_code=400, detail=str(e.orig) if hasattr(e, "orig") else str(e)
@@ -44,16 +40,11 @@ class BaseController:
             logger.exception(e)
             raise HTTPException(status_code=500, detail=str(e))
 
-    async def upsert(self, object: ModelT = Body(...)):
+    async def upsert(self, object: SchemaT = Body(...)):
         try:
-            if not object.model_dump(
-                exclude_unset=True, exclude_defaults=True, exclude_none=True
-            ):
-                raise HTTPException(
-                    status_code=400, detail="Request body cannot be empty"
-                )
-            result = await self.service.upsert(object=object)
-            return JSONResponse(jsonable_encoder(result), status_code=200)
+            validated_object = self.schema(**object)
+            result = await self.service.upsert(object=validated_object)
+            return JSONResponse(result, status_code=200)
         except sqlalchemy.exc.SQLAlchemyError as e:
             raise HTTPException(
                 status_code=400, detail=str(e.orig) if hasattr(e, "orig") else str(e)
@@ -85,7 +76,7 @@ class BaseController:
             total_records = await self.service.count(filter_by=filter_by)
             return JSONResponse(
                 {
-                    "data": jsonable_encoder(result),
+                    "data": result,
                     "pagination": {
                         "current_page": page,
                         "page_size": page_size,
@@ -113,7 +104,7 @@ class BaseController:
                     status_code=404,
                     detail=f"{self.service.repository.model.__name__} not found",
                 )
-            return JSONResponse(jsonable_encoder(result), status_code=200)
+            return JSONResponse(result, status_code=200)
         except sqlalchemy.exc.SQLAlchemyError as e:
             raise HTTPException(
                 status_code=400, detail=str(e.orig) if hasattr(e, "orig") else str(e)
@@ -124,7 +115,7 @@ class BaseController:
             logger.exception(e)
             raise HTTPException(status_code=500, detail=str(e))
 
-    async def patch(self, id: Any, data: Dict[str, Any] = Body(...)):
+    async def patch(self, id: Any, data: SchemaT = Body(...)):
         try:
             if not data:
                 raise HTTPException(
@@ -132,7 +123,7 @@ class BaseController:
                     detail="Request body cannot be empty",
                 )
             result = await self.service.patch(id=id, **data)
-            return JSONResponse(jsonable_encoder(result), status_code=200)
+            return JSONResponse(result, status_code=200)
         except sqlalchemy.exc.SQLAlchemyError as e:
             raise HTTPException(
                 status_code=400, detail=str(e.orig) if hasattr(e, "orig") else str(e)

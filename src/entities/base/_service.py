@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Optional, Type, TypeVar
 
-from ._repository import BaseRepository, ModelT
+from ._repository import BaseRepository
+from ._schema import BaseSchema
 
 RepositoryT = TypeVar("RepositoryT", bound="BaseRepository")
 
@@ -9,11 +10,15 @@ class BaseService:
     def __init__(self, repository: Type[RepositoryT]):
         self.repository = repository()
 
-    async def create(self, object: ModelT):
-        return await self.repository.create(object=object)
+    async def create(self, object: BaseSchema):
+        return await self.repository.create(
+            object=self.repository.model(**object.model_dump())
+        )
 
-    async def upsert(self, object: ModelT):
-        return await self.repository.upsert(object=object)
+    async def upsert(self, object: BaseSchema):
+        return await self.repository.upsert(
+            object=self.repository.model(**object.model_dump())
+        )
 
     async def list(
         self,

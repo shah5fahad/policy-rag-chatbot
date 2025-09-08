@@ -12,10 +12,10 @@ from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
-from sqlmodel import SQLModel
 
-# Import all models so SQLModel.metadata is populated
+# Import all models so Base.metadata is populated
 from src.entities import *
+from src.entities.base import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -26,12 +26,9 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Use SQLModel's metadata for autogenerate
+# Use SQLAlchemy's Base metadata for autogenerate
 # Ensure all models are imported above so metadata is complete
-# target_metadata = Base.metadata
-from sqlmodel import SQLModel
-
-target_metadata = SQLModel.metadata
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

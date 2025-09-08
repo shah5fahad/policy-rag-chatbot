@@ -1,16 +1,10 @@
 from fastapi import APIRouter
 
-from src.entities.base import *
-from src.entities.example import *
-from src.entities.example2 import *
+from .base import *
+from .test import *
 
-api_router = APIRouter()
+api_router = APIRouter(prefix="/v1")
 
-api_router.include_router(
-    ExampleController().router, prefix="/example", tags=["example"]
-)
-api_router.include_router(
-    Example2Controller().router, prefix="/example2", tags=["example2"]
-)
+api_router.include_router(TestController().router, prefix="/tests", tags=["tests"])
 
-__all__ = ["api_router", "Example", "Example2"]
+__all__ = ["api_router"]

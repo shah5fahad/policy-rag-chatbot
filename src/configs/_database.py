@@ -1,9 +1,8 @@
+import os
 import threading
 from contextlib import asynccontextmanager
 
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-
-from ._env import EnvConfig
 
 
 class DatabaseConfig:
@@ -13,7 +12,7 @@ class DatabaseConfig:
     def get_engine(cls):
         if not hasattr(cls._thread_local, "engine"):
             cls._thread_local.engine = create_async_engine(
-                url=EnvConfig.DATABASE_URI,
+                url=os.getenv("SQLALCHEMY_DATABASE_URI"),
                 pool_recycle=3600,
             )
         return cls._thread_local.engine

@@ -1,31 +1,36 @@
-# fastapi-template
+# FastAPI Template
 
-It is a template for creating a FastAPI project with a clean architecture. It contains a proper directory structure and a few example files. It is initialised with poetry, alembic, sqlalchemy and few other commonlly used libraries.
+A simple template for building APIs with FastAPI, a modern, fast web framework for building APIs with Python 3.7+ based on standard Python type hints.
 
 ## Features
 
-- **FastAPI**: FastAPI is a modern, fast (high-performance), web framework for building APIs with Python 3.6+ based on standard Python type hints.
+- FastAPI for high-performance API development
+- Automatic interactive API documentation with Swagger UI
+- Built-in support for async operations
+- Easy integration with databases (e.g., SQLAlchemy)
+- Pydantic for data validation
+- CORS support for cross-origin requests
 
-- **Pydantic**: Data validation and settings management using python type annotations.
+## Installation
 
-- **SQLAlchemy**: SQLAlchemy is the Python SQL toolkit and Object Relational Mapper that gives application developers the full power and flexibility of SQL.
+1. Create a virtual environment:
 
-- **Alembic**: Alembic is a lightweight database migration tool for SQLAlchemy.
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-- **Poetry**: Poetry is a tool for dependency management and packaging in Python.
+2. Install dependencies:
+   ```bash
+   poetry install
+   ```
 
-- **Docker**: Docker is a set of platform as a service products that use OS-level virtualization to deliver software in packages called containers.
+## Usage
 
-# Note: This project is created for template purpose only. Any piece of code can be modified as per the requirement. All the dependencies added in the pyproject.toml file are for the template purpose only. You can add or remove any dependencies as per the requirement.
+1. Run the development server:
 
-I have added few sample files in the project to maintain the directory structure and give an idea of how to use the template. You can remove them and add your own files as per the requirement.
+   ```bash
+   uvicorn src.app:app --reload
+   ```
 
-## Code Formatting
-
-This template includes automatic code formatting setup:
-
-- **Black** & **isort** for Python formatting (configured in `pyproject.toml`)
-- **Flake8** for linting (configured in `.flake8`)
-- **Pre-commit hooks** for automatic formatting on commit
-
-After cloning, run: `poetry install` and `poetry run pre-commit install`
+2. Open your browser and navigate to `http://127.0.0.1:8000/docs` for interactive API documentation.

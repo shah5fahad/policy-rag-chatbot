@@ -1,17 +1,16 @@
-import uuid
-from typing import Optional
+from sqlalchemy import BigInteger, Column, DateTime, func
+from sqlalchemy.ext.declarative import declarative_base
 
-from sqlmodel import Field, SQLModel
+Base = declarative_base()
 
 
-class BaseModel(SQLModel):
+class BaseModel(Base):
     __abstract__ = True  # This model should not be instantiated directly
     __table_args__ = {"extend_existing": True}  # Allow table extension
 
-    id: Optional[str] = Field(
-        default_factory=lambda: str(uuid.uuid4()),
-        primary_key=True,
-        index=True,
-        nullable=False,
-        unique=True,
+    id = Column(BigInteger, primary_key=True, autoincrement=True, nullable=False)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    updated_at = Column(
+        DateTime, server_default=func.now(), onupdate=func.now(), nullable=False
     )
+    deleted_at = Column(DateTime, nullable=True)

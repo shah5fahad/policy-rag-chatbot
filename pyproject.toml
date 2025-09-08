@@ -1,42 +1,31 @@
-[tool.poetry]
-name = "fastapi-template"
+[project]
+name = "backend"
 version = "0.1.0"
-description = "FastAPI template to automatically create BREAD APIs"
-authors = ["Kanha Upadhyay <kanha.upadhyay@sifars.com>"]
+description = ""
+authors = [
+    {name = "Kanha Upadhyay",email = "kanha.upadhyay@sifars.com"}
+]
 readme = "README.md"
-packages = [{ include = "src" }]
+requires-python = "3.12.*"
+dependencies = [
+    "fastapi (>=0.116.1,<0.117.0)",
+    "uvicorn (>=0.35.0,<0.36.0)",
+    "gunicorn (>=23.0.0,<24.0.0)",
+    "sqlalchemy (>=2.0.43,<3.0.0)",
+    "alembic (>=1.16.5,<2.0.0)",
+    "asyncpg (>=0.30.0,<0.31.0)",
+    "greenlet (>=3.2.4,<4.0.0)",
+    "python-dotenv (>=1.1.1,<2.0.0)",
+    "loguru (>=0.7.3,<0.8.0)",
+    "pydantic (>=2.11.7,<3.0.0)",
+    "aiosqlite (>=0.21.0,<0.22.0)",
+    "aiomysql (>=0.2.0,<0.3.0)"
+]
 
-[tool.poetry.dependencies]
-python = "^3.13"
-sqlalchemy = "^2.0"
-alembic = "^1.13.1"
-pydantic = "^2.7"
-python-dotenv = "^1.1.0"
-loguru = "^0.7.3"
-fastapi = "^0.115.13"
-uvicorn = "^0.34.3"
-greenlet = "^3.2.3"
-sqlmodel = "^0.0.24"
-aiosqlite = "^0.21.0"
-asyncpg = "^0.30.0"
-aiomysql = "^0.2.0"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.2"
-black = "^24.0.0"
-isort = "^5.13.0"
-flake8 = "^7.0.0"
-pre-commit = "^3.6.0"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.black]
-line-length = 88
-target-version = ['py312']
-
-[tool.isort]
-profile = "black"
-line_length = 88
-src_paths = ["src"]
+[tool.poetry]
+package-mode = false

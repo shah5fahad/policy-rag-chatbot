@@ -1,3 +1,13 @@
+import os
+
+from dotenv import load_dotenv
+
+# ===========================
+# !!! ATTENTION !!!
+# KEEP THIS AT THE TOP TO ENSURE ENVIRONMENT VARIABLES ARE LOADED BEFORE ANY IMPORTS
+# ===========================
+load_dotenv()
+
 from contextlib import asynccontextmanager
 
 from alembic import command
@@ -6,7 +16,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
-from src.configs import DatabaseConfig, EnvConfig
+from src.configs import DatabaseConfig
 from src.entities import api_router
 
 
@@ -18,7 +28,9 @@ def run_upgrade(connection, alembic_config: Config):
 async def run_migrations():
     logger.info("Running migrations if any...")
     alembic_config = Config("alembic.ini")
-    alembic_config.set_main_option("sqlalchemy.url", EnvConfig.DATABASE_URI)
+    alembic_config.set_main_option(
+        "sqlalchemy.url", os.getenv("SQLALCHEMY_DATABASE_URI")
+    )
     async with DatabaseConfig.get_engine().begin() as session:
         await session.run_sync(run_upgrade, alembic_config)
 
@@ -31,7 +43,7 @@ async def lifespan(app: FastAPI):
         logger.info("Application started successfully...")
         yield
     except Exception as e:
-        logger.error(f"Error during startup: {str(e)}")
+        logger.exception(e)
         raise
     finally:
         logger.info("Application shutdown complete.")
@@ -42,7 +54,12 @@ app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=EnvConfig.CORS_ALLOW_ORIGINS,
+    allow_origins=[
+        origin.strip()
+        for origin in os.getenv(
+            "CORS_ALLOW_ORIGINS", "http://localhost, http://127.0.0.1"
+        ).split(",")
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
