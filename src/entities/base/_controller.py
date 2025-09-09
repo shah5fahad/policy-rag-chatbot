@@ -16,7 +16,6 @@ class BaseController(Generic[ServiceT]):
         self.service = service()
 
         self.router.post("/")(self.create)
-        self.router.put("/")(self.upsert)
         self.router.get("/")(self.list)
         self.router.get("/{id}")(self.get)
         self.router.patch("/{id}")(self.patch)
@@ -25,20 +24,6 @@ class BaseController(Generic[ServiceT]):
     async def create(self, data: Dict[str, Any] = Body(...)):
         try:
             result = await self.service.create(data)
-            return result
-        except sqlalchemy.exc.SQLAlchemyError as e:
-            raise HTTPException(
-                status_code=400, detail=str(e.orig) if hasattr(e, "orig") else str(e)
-            )
-        except HTTPException as e:
-            raise e
-        except Exception as e:
-            logger.exception(e)
-            raise HTTPException(status_code=500, detail=str(e))
-
-    async def upsert(self, data: Dict[str, Any] = Body(...)):
-        try:
-            result = await self.service.upsert(data)
             return result
         except sqlalchemy.exc.SQLAlchemyError as e:
             raise HTTPException(

@@ -12,9 +12,6 @@ class BaseService:
     async def create(self, data: Dict[str, Any]):
         return await self.repository.create(object=self.repository.model(**data))
 
-    async def upsert(self, data: Dict[str, Any]):
-        return await self.repository.upsert(object=self.repository.model(**data))
-
     async def list(
         self,
         page: int = 1,

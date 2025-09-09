@@ -36,24 +36,6 @@ class BaseRepository:
             await session.refresh(object)
             return object
 
-    async def upsert(self, object: ModelT):
-        async with self.get_session() as session:
-            instance = await session.get(self.model, object.id)
-            if not instance:
-                instance = object
-                session.add(instance)
-            else:
-                column_names = [c.key for c in self.model.__table__.columns]
-                for key, value in object.__dict__.items():
-                    if key.startswith("_"):
-                        continue
-                    if key not in column_names:
-                        raise SQLAlchemyError(f"Invalid field: {key}")
-                    setattr(instance, key, value)
-            await session.commit()
-            await session.refresh(instance)
-            return instance
-
     async def list(
         self,
         page: int = 1,
