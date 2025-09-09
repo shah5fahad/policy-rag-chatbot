@@ -9,7 +9,7 @@ class BaseService:
     def __init__(self, repository: Type[RepositoryT]):
         self.repository = repository()
 
-    async def create(self, data: Dict[str, Any]):
+    async def create(self, data: dict):
         return await self.repository.create(object=self.repository.model(**data))
 
     async def list(
@@ -29,11 +29,11 @@ class BaseService:
     async def get(self, id: int):
         return await self.repository.get(id=id)
 
-    async def patch(self, id: int, data: Dict[str, Any]):
+    async def patch(self, id: int, data: dict):
         return await self.repository.patch(id=id, **data)
 
     async def delete(self, id: int):
         return await self.repository.delete(id=id)
 
-    async def count(self, filter_by: Dict[str, Any] | None = None):
+    async def count(self, filter_by: dict | None = None):
         return await self.repository.count(filter_by=filter_by)

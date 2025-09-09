@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, Dict, Optional
 
-from ..base._schema import BaseSchema
+from ..base import BaseSchema
 
 
 class AuditLogSchema(BaseSchema):

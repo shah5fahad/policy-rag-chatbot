@@ -1,4 +1,4 @@
-from ..base._service import BaseService
+from ..base import BaseService
 from ._repository import AuditLogRepository
 
 

@@ -8,7 +8,7 @@ def parse_model_file(file_path: str) -> Tuple[str, str, Dict[str, Tuple[str, boo
         content = f.read()
 
     # Find class name
-    class_match = re.search(r"class (\w+)\(BaseModel\):", content)
+    class_match = re.search(r"class (\w+)\(BaseModel_\):", content)
     class_name = class_match.group(1) if class_match else None
 
     # Find table name
@@ -35,7 +35,6 @@ def parse_model_file(file_path: str) -> Tuple[str, str, Dict[str, Tuple[str, boo
         nullable = True
         if "nullable=False" in options or "nullable = False" in options:
             nullable = False
-
         fields[field_name] = (col_type, nullable)
 
     return class_name, table_name, fields
@@ -47,9 +46,11 @@ def map_sqlalchemy_to_pydantic(sql_type: str) -> str:
         "String": "str",
         "Text": "str",
         "Integer": "int",
+        "BigInteger": "int",
         "Boolean": "bool",
         "Numeric": "float",
         "Date": "date",
+        "DateTime": "datetime",
         "JSON": "Dict[str, Any]",
         "ForeignKey": "int",  # Assuming id is int
     }
@@ -64,7 +65,6 @@ from ._model import {class_name}
 class {class_name}Repository(BaseRepository):
     def __init__(self):
         super().__init__({class_name})
-
 """
     with open(file_path, "w") as f:
         f.write(content)
@@ -78,22 +78,28 @@ from ._repository import {class_name}Repository
 class {class_name}Service(BaseService):
     def __init__(self):
         super().__init__({class_name}Repository)
-
 """
     with open(file_path, "w") as f:
         f.write(content)
 
 
 def generate_controller(entity_name: str, class_name: str, file_path: str):
-    content = f"""from ..base import BaseController
+    content = f"""from fastapi import Body
+
+from ..base import BaseController
 from ._schema import {class_name}Schema
 from ._service import {class_name}Service
 
 
-class {class_name}Controller(BaseController[{class_name}Schema]):
+class {class_name}Controller(BaseController):
     def __init__(self):
-        super().__init__({class_name}Service, {class_name}Schema)
+        super().__init__({class_name}Service)
 
+    async def create(self, data: {class_name}Schema = Body(...)):
+        return await super().create(data.model_dump())
+
+    async def patch(self, id: int, data: {class_name}Schema = Body(...)):
+        return await super().patch(id, data.model_dump())
 """
     with open(file_path, "w") as f:
         f.write(content)
@@ -106,8 +112,16 @@ def generate_schema(
     file_path: str,
 ):
     imports = "from typing import Any, Dict, Optional\n\n"
-    if any("date" in map_sqlalchemy_to_pydantic(t) for t, _ in fields.values()):
+    has_date = any("date" in map_sqlalchemy_to_pydantic(t) for t, _ in fields.values())
+    has_datetime = any(
+        "datetime" in map_sqlalchemy_to_pydantic(t) for t, _ in fields.values()
+    )
+    if has_date or has_datetime:
+        imports = "from datetime import date, datetime\n" + imports
+    elif has_date:
         imports = "from datetime import date\n" + imports
+    elif has_datetime:
+        imports = "from datetime import datetime\n" + imports
 
     content = imports
     content += f"""from ..base import BaseSchema
@@ -143,15 +157,15 @@ def main():
     entities = [
         d
         for d in os.listdir(entities_dir)
-        if os.path.isdir(os.path.join(entities_dir, d)) and d not in ["base", "test"]
+        if os.path.isdir(os.path.join(entities_dir, d)) and d not in ["base"]
     ]
 
     for entity in entities:
         entity_dir = os.path.join(entities_dir, entity)
         model_file = os.path.join(entity_dir, "_model.py")
-        service_file = os.path.join(entity_dir, "_service.py")
+        controller_file = os.path.join(entity_dir, "_controller.py")
 
-        if os.path.exists(model_file) and not os.path.exists(service_file):
+        if os.path.exists(model_file) and not os.path.exists(controller_file):
             print(f"Generating files for {entity}")
 
             class_name, table_name, fields = parse_model_file(model_file)

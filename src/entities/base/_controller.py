@@ -1,4 +1,4 @@
-from typing import Any, Dict, Generic, List, Optional, Type, TypeVar
+from typing import Generic, List, Optional, Type, TypeVar
 
 import sqlalchemy.exc
 from fastapi import APIRouter, Body, HTTPException, Query, Request
@@ -21,7 +21,7 @@ class BaseController(Generic[ServiceT]):
         self.router.patch("/{id}")(self.patch)
         self.router.delete("/{id}")(self.delete)
 
-    async def create(self, data: Dict[str, Any] = Body(...)):
+    async def create(self, data: dict = Body(...)):
         try:
             result = await self.service.create(data)
             return result
@@ -94,14 +94,14 @@ class BaseController(Generic[ServiceT]):
             logger.exception(e)
             raise HTTPException(status_code=500, detail=str(e))
 
-    async def patch(self, id: int, data: Dict[str, Any] = Body(...)):
+    async def patch(self, id: int, data: dict = Body(...)):
         try:
             if not data:
                 raise HTTPException(
                     status_code=400,
                     detail="Request body cannot be empty",
                 )
-            result = await self.service.patch(id=id, data=data)
+            result = await self.service.patch(id=id, **data)
             return result
         except sqlalchemy.exc.SQLAlchemyError as e:
             raise HTTPException(

@@ -1,4 +1,4 @@
-from ..base._repository import BaseRepository
+from ..base import BaseRepository
 from ._model import AuditLog
 
 
