@@ -1,9 +1,9 @@
 from sqlalchemy import JSON, Column, String
 
-from ..base import BaseModel
+from ..base import BaseModel_
 
 
-class Test(BaseModel):
+class Test(BaseModel_):
     __tablename__ = "tests"
 
     name = Column(String(255), nullable=False, unique=True)

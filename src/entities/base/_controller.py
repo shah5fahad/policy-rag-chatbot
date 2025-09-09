@@ -1,22 +1,19 @@
-from typing import Any, Generic, List, Optional, Type, TypeVar
+from typing import Any, Dict, Generic, List, Optional, Type, TypeVar
 
 import sqlalchemy.exc
 from fastapi import APIRouter, Body, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 from loguru import logger
 
-from ._schema import BaseSchema
 from ._service import BaseService
 
 ServiceT = TypeVar("ServiceT", bound=BaseService)
-SchemaT = TypeVar("SchemaT", bound=BaseSchema)
 
 
-class BaseController(Generic[SchemaT]):
-    def __init__(self, service: Type[ServiceT], schema: Type[SchemaT]):
+class BaseController(Generic[ServiceT]):
+    def __init__(self, service: Type[ServiceT]):
         self.router = APIRouter()
         self.service = service()
-        self.schema = schema
 
         self.router.post("/")(self.create)
         self.router.put("/")(self.upsert)
@@ -25,11 +22,10 @@ class BaseController(Generic[SchemaT]):
         self.router.patch("/{id}")(self.patch)
         self.router.delete("/{id}")(self.delete)
 
-    async def create(self, object: SchemaT = Body(...)):
+    async def create(self, data: Dict[str, Any] = Body(...)):
         try:
-            validated_object = self.schema(**object)
-            result = await self.service.create(object=validated_object)
-            return JSONResponse(result, status_code=201)
+            result = await self.service.create(data)
+            return result
         except sqlalchemy.exc.SQLAlchemyError as e:
             raise HTTPException(
                 status_code=400, detail=str(e.orig) if hasattr(e, "orig") else str(e)
@@ -40,11 +36,10 @@ class BaseController(Generic[SchemaT]):
             logger.exception(e)
             raise HTTPException(status_code=500, detail=str(e))
 
-    async def upsert(self, object: SchemaT = Body(...)):
+    async def upsert(self, data: Dict[str, Any] = Body(...)):
         try:
-            validated_object = self.schema(**object)
-            result = await self.service.upsert(object=validated_object)
-            return JSONResponse(result, status_code=200)
+            result = await self.service.upsert(data)
+            return result
         except sqlalchemy.exc.SQLAlchemyError as e:
             raise HTTPException(
                 status_code=400, detail=str(e.orig) if hasattr(e, "orig") else str(e)
@@ -74,7 +69,7 @@ class BaseController(Generic[SchemaT]):
                 page=page, page_size=page_size, filter_by=filter_by, order_by=order_by
             )
             total_records = await self.service.count(filter_by=filter_by)
-            return JSONResponse(
+            return (
                 {
                     "data": result,
                     "pagination": {
@@ -84,7 +79,6 @@ class BaseController(Generic[SchemaT]):
                         "total_records": total_records,
                     },
                 },
-                status_code=200,
             )
         except sqlalchemy.exc.SQLAlchemyError as e:
             raise HTTPException(
@@ -96,7 +90,7 @@ class BaseController(Generic[SchemaT]):
             logger.exception(e)
             raise HTTPException(status_code=500, detail=str(e))
 
-    async def get(self, id: Any):
+    async def get(self, id: int):
         try:
             result = await self.service.get(id=id)
             if not result:
@@ -104,7 +98,7 @@ class BaseController(Generic[SchemaT]):
                     status_code=404,
                     detail=f"{self.service.repository.model.__name__} not found",
                 )
-            return JSONResponse(result, status_code=200)
+            return result
         except sqlalchemy.exc.SQLAlchemyError as e:
             raise HTTPException(
                 status_code=400, detail=str(e.orig) if hasattr(e, "orig") else str(e)
@@ -115,15 +109,15 @@ class BaseController(Generic[SchemaT]):
             logger.exception(e)
             raise HTTPException(status_code=500, detail=str(e))
 
-    async def patch(self, id: Any, data: SchemaT = Body(...)):
+    async def patch(self, id: int, data: Dict[str, Any] = Body(...)):
         try:
             if not data:
                 raise HTTPException(
                     status_code=400,
                     detail="Request body cannot be empty",
                 )
-            result = await self.service.patch(id=id, **data)
-            return JSONResponse(result, status_code=200)
+            result = await self.service.patch(id=id, data=data)
+            return result
         except sqlalchemy.exc.SQLAlchemyError as e:
             raise HTTPException(
                 status_code=400, detail=str(e.orig) if hasattr(e, "orig") else str(e)
@@ -134,7 +128,7 @@ class BaseController(Generic[SchemaT]):
             logger.exception(e)
             raise HTTPException(status_code=500, detail=str(e))
 
-    async def delete(self, id: Any):
+    async def delete(self, id: int):
         try:
             await self.service.delete(id=id)
             return JSONResponse(status_code=204, content=None)

@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 
-class BaseModel(Base):
+class BaseModel_(Base):
     __abstract__ = True  # This model should not be instantiated directly
     __table_args__ = {"extend_existing": True}  # Allow table extension
 

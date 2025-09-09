@@ -8,9 +8,9 @@ from sqlalchemy.sql import Select
 
 from src.configs import DatabaseConfig
 
-from ._model import BaseModel
+from ._model import BaseModel_
 
-ModelT = TypeVar("ModelT", bound=BaseModel)
+ModelT = TypeVar("ModelT", bound=BaseModel_)
 
 
 class BaseRepository:
@@ -82,12 +82,12 @@ class BaseRepository:
             result = await session.execute(query)
             return [item for item in result.scalars().all()]
 
-    async def get(self, id: Any):
+    async def get(self, id: int):
         async with self.get_session() as session:
             result = await session.get(self.model, id)
             return result
 
-    async def patch(self, id: Any, **kwargs: Dict[str, Any]):
+    async def patch(self, id: int, **kwargs: Dict[str, Any]):
         async with self.get_session() as session:
             instance = await session.get(self.model, id)
             if not instance:
@@ -101,7 +101,7 @@ class BaseRepository:
             await session.refresh(instance)
             return instance
 
-    async def delete(self, id: Any):
+    async def delete(self, id: int):
         async with self.get_session() as session:
             instance = await session.get(self.model, id)
             if not instance:
