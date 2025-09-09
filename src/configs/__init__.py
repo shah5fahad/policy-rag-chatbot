@@ -1,3 +1,1 @@
-from ._database import DatabaseConfig
-
-__all__ = ["DatabaseConfig"]
+from ._database import *
