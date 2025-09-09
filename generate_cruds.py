@@ -3,23 +3,46 @@ import re
 from typing import Dict, Tuple
 
 
-def parse_model_file(file_path: str) -> Tuple[str, str, Dict[str, Tuple[str, bool]]]:
+def parse_model_file(
+    file_path: str, expected_class_name: str
+) -> Tuple[str, str, Dict[str, Tuple[str, bool]]]:
     with open(file_path, "r") as f:
         content = f.read()
 
-    # Find class name
-    class_match = re.search(r"class (\w+)\(BaseModel_\):", content)
-    class_name = class_match.group(1) if class_match else None
+    lines = content.split("\n")
+
+    class_start = None
+    for i, line in enumerate(lines):
+        if re.match(rf"class {expected_class_name}\(BaseModel_\):", line):
+            class_start = i
+            break
+
+    if class_start is None:
+        return None, None, {}
+
+    # Find end of class
+    class_end = len(lines)
+    indent_level = len(line) - len(line.lstrip())
+    for i in range(class_start + 1, len(lines)):
+        line_indent = len(lines[i]) - len(lines[i].lstrip())
+        if line_indent <= indent_level and lines[i].strip():
+            class_end = i
+            break
+        elif lines[i].strip() == "":
+            continue
+
+    class_lines = lines[class_start:class_end]
+    class_content = "\n".join(class_lines)
 
     # Find table name
-    table_match = re.search(r'__tablename__ = "(\w+)"', content)
+    table_match = re.search(r'__tablename__ = "(\w+)"', class_content)
     table_name = table_match.group(1) if table_match else None
 
     # Find fields
     fields = {}
     # Match field = Column(Type(...), ...)
     field_pattern = re.compile(r"(\w+) = Column\(([^,]+),?\s*(.*)\)", re.MULTILINE)
-    for match in field_pattern.finditer(content):
+    for match in field_pattern.finditer(class_content):
         field_name = match.group(1)
         type_part = match.group(2).strip()
         options = match.group(3)
@@ -37,7 +60,7 @@ def parse_model_file(file_path: str) -> Tuple[str, str, Dict[str, Tuple[str, boo
             nullable = False
         fields[field_name] = (col_type, nullable)
 
-    return class_name, table_name, fields
+    return expected_class_name, table_name, fields
 
 
 def map_sqlalchemy_to_pydantic(sql_type: str) -> str:
@@ -152,6 +175,42 @@ from ._service import *
         f.write(content)
 
 
+def update_main_init(entity: str, class_name: str):
+    main_init_path = "src/entities/__init__.py"
+    with open(main_init_path, "r") as f:
+        content = f.read()
+
+    # Check if already imported
+    import_line = f"from .{entity} import *"
+    if import_line not in content:
+        lines = content.split("\n")
+        insert_index = len(lines)
+        for i, line in enumerate(lines):
+            if line.startswith("from .") and "import *" in line:
+                insert_index = i + 1
+        lines.insert(insert_index, import_line)
+        content = "\n".join(lines)
+
+    # Add the router include
+    router_line = f"""api_router.include_router(
+    {class_name}Controller().router, prefix="/{entity.replace('_', '-')}", tags=["{entity.replace('_', '-')}"]
+)"""
+    if router_line not in content:
+        lines = content.split("\n")
+        insert_index = len(lines)
+        for i, line in enumerate(lines):
+            if "api_router.include_router(" in line:
+                j = i
+                while j < len(lines) and not lines[j].strip().endswith(")"):
+                    j += 1
+                insert_index = j + 1
+        lines.insert(insert_index, router_line)
+        content = "\n".join(lines)
+
+    with open(main_init_path, "w") as f:
+        f.write(content)
+
+
 def main():
     entities_dir = "src/entities"
     entities = [
@@ -168,12 +227,17 @@ def main():
         if os.path.exists(model_file) and not os.path.exists(controller_file):
             print(f"Generating files for {entity}")
 
-            class_name, table_name, fields = parse_model_file(model_file)
+            expected_class_name = "".join(
+                word.capitalize() for word in entity.split("_")
+            )
+            class_name, table_name, fields = parse_model_file(
+                model_file, expected_class_name
+            )
             print(
                 f"Parsed {entity}: class={class_name}, table={table_name}, fields={fields}"
             )
             if not class_name:
-                print(f"Could not parse class name for {entity}")
+                print(f"Could not find class {expected_class_name} for {entity}")
                 continue
 
             # Generate repository
@@ -198,6 +262,7 @@ def main():
 
             # Update __init__.py
             update_init(entity_dir)
+            update_main_init(entity, class_name)
 
             print(f"Generated files for {entity}")
 
