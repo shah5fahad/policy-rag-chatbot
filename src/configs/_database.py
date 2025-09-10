@@ -34,3 +34,8 @@ class DatabaseConfig:
         session_factory = cls._get_session_factory()
         async with session_factory() as session:
             yield session
+
+
+async def get_db_session():
+    async with DatabaseConfig.async_session() as session:
+        yield session

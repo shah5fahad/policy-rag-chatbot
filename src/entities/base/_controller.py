@@ -22,6 +22,7 @@ class BaseController(Generic[ServiceT]):
         self.router.delete("/{id}")(self.delete)
 
     async def create(self, data: dict = Body(...)):
+        logger.debug(f"Create with data: {data}")
         try:
             result = await self.service.create(data)
             return result
@@ -30,6 +31,7 @@ class BaseController(Generic[ServiceT]):
                 status_code=400, detail=str(e.orig) if hasattr(e, "orig") else str(e)
             )
         except HTTPException as e:
+            logger.warning(e)
             raise e
         except Exception as e:
             logger.exception(e)
@@ -42,6 +44,9 @@ class BaseController(Generic[ServiceT]):
         page_size: int = Query(10, ge=1, le=100),
         order_by: Optional[List[str]] = Query([]),
     ):
+        logger.debug(
+            f"List with page: {page}, page_size: {page_size}, order_by: {order_by}, query_params: {request.query_params}"
+        )
         try:
             filter_by = {}
             if request.query_params:
@@ -70,12 +75,14 @@ class BaseController(Generic[ServiceT]):
                 status_code=400, detail=str(e.orig) if hasattr(e, "orig") else str(e)
             )
         except HTTPException as e:
+            logger.warning(e)
             raise e
         except Exception as e:
             logger.exception(e)
             raise HTTPException(status_code=500, detail=str(e))
 
     async def get(self, id: int):
+        logger.debug(f"Get id: {id}")
         try:
             result = await self.service.get(id=id)
             if not result:
@@ -89,12 +96,14 @@ class BaseController(Generic[ServiceT]):
                 status_code=400, detail=str(e.orig) if hasattr(e, "orig") else str(e)
             )
         except HTTPException as e:
+            logger.warning(e)
             raise e
         except Exception as e:
             logger.exception(e)
             raise HTTPException(status_code=500, detail=str(e))
 
     async def patch(self, id: int, data: dict = Body(...)):
+        logger.debug(f"Patch id: {id} with data: {data}")
         try:
             if not data:
                 raise HTTPException(
@@ -108,12 +117,14 @@ class BaseController(Generic[ServiceT]):
                 status_code=400, detail=str(e.orig) if hasattr(e, "orig") else str(e)
             )
         except HTTPException as e:
+            logger.warning(e)
             raise e
         except Exception as e:
             logger.exception(e)
             raise HTTPException(status_code=500, detail=str(e))
 
     async def delete(self, id: int):
+        logger.debug(f"Delete id: {id}")
         try:
             await self.service.delete(id=id)
             return JSONResponse(status_code=204, content=None)
@@ -122,6 +133,7 @@ class BaseController(Generic[ServiceT]):
                 status_code=400, detail=str(e.orig) if hasattr(e, "orig") else str(e)
             )
         except HTTPException as e:
+            logger.warning(e)
             raise e
         except Exception as e:
             logger.exception(e)
