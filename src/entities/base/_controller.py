@@ -27,6 +27,7 @@ class BaseController(Generic[ServiceT]):
             result = await self.service.create(data)
             return result
         except sqlalchemy.exc.SQLAlchemyError as e:
+            logger.warning(e)
             raise HTTPException(
                 status_code=400, detail=str(e.orig) if hasattr(e, "orig") else str(e)
             )
@@ -71,6 +72,7 @@ class BaseController(Generic[ServiceT]):
                 },
             )
         except sqlalchemy.exc.SQLAlchemyError as e:
+            logger.warning(e)
             raise HTTPException(
                 status_code=400, detail=str(e.orig) if hasattr(e, "orig") else str(e)
             )
@@ -92,6 +94,7 @@ class BaseController(Generic[ServiceT]):
                 )
             return result
         except sqlalchemy.exc.SQLAlchemyError as e:
+            logger.warning(e)
             raise HTTPException(
                 status_code=400, detail=str(e.orig) if hasattr(e, "orig") else str(e)
             )
@@ -113,6 +116,7 @@ class BaseController(Generic[ServiceT]):
             result = await self.service.patch(id=id, **data)
             return result
         except sqlalchemy.exc.SQLAlchemyError as e:
+            logger.warning(e)
             raise HTTPException(
                 status_code=400, detail=str(e.orig) if hasattr(e, "orig") else str(e)
             )
@@ -129,6 +133,7 @@ class BaseController(Generic[ServiceT]):
             await self.service.delete(id=id)
             return JSONResponse(status_code=204, content=None)
         except sqlalchemy.exc.SQLAlchemyError as e:
+            logger.warning(e)
             raise HTTPException(
                 status_code=400, detail=str(e.orig) if hasattr(e, "orig") else str(e)
             )
