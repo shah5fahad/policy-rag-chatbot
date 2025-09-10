@@ -13,4 +13,3 @@ class BaseModel_(Base):
     updated_at = Column(
         DateTime, server_default=func.now(), onupdate=func.now(), nullable=False
     )
-    deleted_at = Column(DateTime, nullable=True)

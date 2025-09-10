@@ -1,8 +1,8 @@
-"""init template
+"""init template with auto audit logging
 
-Revision ID: 0cf842512e09
+Revision ID: 0af612617347
 Revises:
-Create Date: 2025-09-09 16:19:19.528946
+Create Date: 2025-09-10 16:44:48.294271
 
 """
 
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "0cf842512e09"
+revision: str = "0af612617347"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -47,7 +47,6 @@ def upgrade():
             server_default=sa.text("(CURRENT_TIMESTAMP)"),
             nullable=False,
         ),
-        sa.Column("deleted_at", sa.DateTime(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(
