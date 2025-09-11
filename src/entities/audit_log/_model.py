@@ -36,9 +36,12 @@ def _to_json_safe(value):
 
 
 def _serialize(obj):
-    """Turn SQLAlchemy model into JSON-safe dict without internals."""
+    """Turn SQLAlchemy model into JSON-safe dict without internals or relationships."""
+    # Only serialize column attributes, not relationships
+    insp = inspect(obj)
     return {
-        k: _to_json_safe(v) for k, v in vars(obj).items() if not k.startswith("_sa_")
+        attr.key: _to_json_safe(getattr(obj, attr.key))
+        for attr in insp.mapper.column_attrs
     }
 
 
