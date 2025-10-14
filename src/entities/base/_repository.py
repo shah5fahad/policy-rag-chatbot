@@ -1,7 +1,18 @@
 from contextlib import asynccontextmanager
 from typing import Any, Dict, List, Optional, Type, TypeVar
 
-from sqlalchemy import asc, desc, func
+from sqlalchemy import (
+    JSON,
+    BigInteger,
+    Date,
+    Integer,
+    Numeric,
+    String,
+    Text,
+    asc,
+    desc,
+    func,
+)
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.future import select
 from sqlalchemy.sql import Select
@@ -16,6 +27,41 @@ ModelT = TypeVar("ModelT", bound=BaseModel_)
 class BaseRepository:
     def __init__(self, model: Type[ModelT]):
         self.model = model
+
+    def _convert_filter_by(self, filter_by: Dict[str, Any]) -> Dict[str, Any]:
+        converted = {}
+        for k, v in filter_by.items():
+            column = self.model.__table__.columns[k]
+            col_type = column.type
+            if isinstance(col_type, (BigInteger, Integer)):
+                try:
+                    converted[k] = int(v)
+                except ValueError:
+                    raise ValueError(f"Invalid integer value for {k}: {v}")
+            elif isinstance(col_type, (String, Text)):
+                converted[k] = str(v)
+            elif isinstance(col_type, Numeric):
+                try:
+                    converted[k] = float(v)
+                except ValueError:
+                    raise ValueError(f"Invalid numeric value for {k}: {v}")
+            elif isinstance(col_type, Date):
+                from datetime import datetime
+
+                try:
+                    converted[k] = datetime.strptime(str(v), "%Y-%m-%d").date()
+                except ValueError:
+                    raise ValueError(f"Invalid date value for {k}: {v}")
+            elif isinstance(col_type, JSON):
+                import json
+
+                try:
+                    converted[k] = json.loads(str(v))
+                except json.JSONDecodeError:
+                    raise ValueError(f"Invalid JSON value for {k}: {v}")
+            else:
+                converted[k] = v
+        return converted
 
     @asynccontextmanager
     async def get_session(self):
@@ -45,6 +91,7 @@ class BaseRepository:
     ):
         column_names = [c.key for c in self.model.__table__.columns]
         filter_by = {k: v for k, v in (filter_by or {}).items() if k in column_names}
+        filter_by = self._convert_filter_by(filter_by)
         order_by = [
             field for field in (order_by or []) if field.lstrip("-") in column_names
         ]
@@ -94,6 +141,7 @@ class BaseRepository:
     async def count(self, filter_by: Optional[Dict[str, Any]] = None):
         column_names = [c.key for c in self.model.__table__.columns]
         filter_by = {k: v for k, v in (filter_by or {}).items() if k in column_names}
+        filter_by = self._convert_filter_by(filter_by)
         async with self.get_session() as session:
             query: Select[Any] = (
                 select(func.count()).select_from(self.model).filter_by(**filter_by)
