@@ -60,17 +60,15 @@ class BaseController(Generic[ServiceT]):
                 page=page, page_size=page_size, filter_by=filter_by, order_by=order_by
             )
             total_records = await self.service.count(filter_by=filter_by)
-            return (
-                {
-                    "data": result,
-                    "pagination": {
-                        "current_page": page,
-                        "page_size": page_size,
-                        "total_pages": (total_records + page_size - 1) // page_size,
-                        "total_records": total_records,
-                    },
+            return {
+                "data": result,
+                "pagination": {
+                    "current_page": page,
+                    "page_size": page_size,
+                    "total_pages": (total_records + page_size - 1) // page_size,
+                    "total_records": total_records,
                 },
-            )
+            }
         except sqlalchemy.exc.SQLAlchemyError as e:
             logger.warning(e)
             raise HTTPException(
