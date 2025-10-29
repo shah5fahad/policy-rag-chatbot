@@ -13,7 +13,11 @@ class DatabaseConfig:
         if not hasattr(cls._thread_local, "engine"):
             cls._thread_local.engine = create_async_engine(
                 url=os.getenv("SQLALCHEMY_DATABASE_URI"),
-                pool_recycle=3600,
+                pool_recycle=1800,
+                pool_size=5,
+                max_overflow=45,
+                pool_pre_ping=True,
+                pool_timeout=60,
             )
         return cls._thread_local.engine
 
