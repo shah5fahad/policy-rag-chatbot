@@ -33,7 +33,14 @@ class DatabaseConfig:
     async def async_session(cls):
         session_factory = cls._get_session_factory()
         async with session_factory() as session:
-            yield session
+            try:
+                yield session
+                await session.commit()
+            except Exception:
+                await session.rollback()
+                raise
+            finally:
+                await session.close()
 
 
 async def get_db_session():
