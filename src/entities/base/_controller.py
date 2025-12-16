@@ -115,7 +115,7 @@ class BaseController(Generic[ServiceT]):
                     status_code=400,
                     detail="Request body cannot be empty",
                 )
-            result = await self.service.patch(id=id, **data)
+            result = await self.service.patch(id=id, data=data)
             return result
         except sqlalchemy.exc.SQLAlchemyError as e:
             logger.warning(e)
