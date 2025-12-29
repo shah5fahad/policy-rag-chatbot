@@ -4,6 +4,8 @@ from contextlib import asynccontextmanager
 
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+from src.utils import get_current_user
+
 
 class DatabaseConfig:
     _thread_local = threading.local()
@@ -37,6 +39,7 @@ class DatabaseConfig:
     async def async_session(cls):
         session_factory = cls._get_session_factory()
         async with session_factory() as session:
+            session.info["user"] = get_current_user()
             try:
                 yield session
                 await session.commit()

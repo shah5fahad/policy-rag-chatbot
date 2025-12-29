@@ -12,12 +12,13 @@ from contextlib import asynccontextmanager
 
 from alembic import command
 from alembic.config import Config
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
 from src.configs import DatabaseConfig
 from src.entities import api_router
+from src.utils import user_context_dependency
 
 
 def run_upgrade(connection, alembic_config: Config):
@@ -49,7 +50,7 @@ async def lifespan(app: FastAPI):
         logger.info("Application shutdown complete.")
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan, dependencies=[Depends(user_context_dependency)])
 
 
 app.add_middleware(
