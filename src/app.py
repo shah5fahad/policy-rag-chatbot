@@ -67,7 +67,7 @@ app.add_middleware(
 )
 
 
-@app.get("/")
+@app.get("/api/")
 async def check_health():
     return {"response": "Service is healthy!"}
 

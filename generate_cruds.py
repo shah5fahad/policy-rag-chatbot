@@ -175,7 +175,7 @@ from ._service import *
         f.write(content)
 
 
-def update_main_init(entity: str, class_name: str):
+def update_main_init(entity: str, class_name: str, table_name: str):
     main_init_path = "src/entities/__init__.py"
     with open(main_init_path, "r") as f:
         content = f.read()
@@ -191,9 +191,10 @@ def update_main_init(entity: str, class_name: str):
         lines.insert(insert_index, import_line)
         content = "\n".join(lines)
 
-    # Add the router include
+    # Add the router include using table_name (plural)
+    route_prefix = table_name.replace("_", "-")
     router_line = f"""api_router.include_router(
-    {class_name}Controller().router, prefix="/{entity.replace('_', '-')}", tags=["{entity.replace('_', '-')}"]
+    {class_name}Controller().router, prefix="/{route_prefix}", tags=["{route_prefix}"]
 )"""
     if router_line not in content:
         lines = content.split("\n")
@@ -262,7 +263,7 @@ def main():
 
             # Update __init__.py
             update_init(entity_dir)
-            update_main_init(entity, class_name)
+            update_main_init(entity, class_name, table_name)
 
             print(f"Generated files for {entity}")
 

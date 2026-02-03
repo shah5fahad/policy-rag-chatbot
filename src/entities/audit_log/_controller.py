@@ -1,4 +1,4 @@
-from fastapi import Body
+from fastapi import Body, HTTPException
 
 from ..base import BaseController
 from ._schema import AuditLogSchema
@@ -10,7 +10,10 @@ class AuditLogController(BaseController):
         super().__init__(AuditLogService)
 
     async def create(self, data: AuditLogSchema = Body(...)):
-        return await super().create(data.model_dump())
+        raise HTTPException(status_code=405, detail="Method not allowed")
 
     async def patch(self, id: int, data: AuditLogSchema = Body(...)):
-        return await super().patch(id, data.model_dump())
+        raise HTTPException(status_code=405, detail="Method not allowed")
+
+    async def delete(self, id: int):
+        raise HTTPException(status_code=405, detail="Method not allowed")
