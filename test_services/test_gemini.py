@@ -1,11 +1,10 @@
+import os
 from google import genai
-print("🔹 Initializing Gemini API client...")
+from dotenv import load_dotenv
 
-# 🔹 Replace with your actual Gemini API key
-API_KEY = "AIzaSyB2fL1Y1_6FZQUtcDScjJ5Q2durWqv8BKI"
+load_dotenv()  # Load environment variables from .env file
 
-# Option 2 (Recommended): Use environment variable
-# API_KEY = os.getenv("GEMINI_API_KEY")
+API_KEY = os.getenv("GEMINI_API_KEY")
 
 try:
     # Initialize client
@@ -22,5 +21,5 @@ try:
     print(response.text)
 
 except Exception as e:
-    print("❌ Error occurred:")
+    print("Error occurred:")
     print(e)
