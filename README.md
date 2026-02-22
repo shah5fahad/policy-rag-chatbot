@@ -1,36 +1,193 @@
-# FastAPI Template
+# Policy Reader Chatbot  
+## RAG-Based Document Q&A System
 
-A simple template for building APIs with FastAPI, a modern, fast web framework for building APIs with Python 3.7+ based on standard Python type hints.
+## Overview
 
-## Features
+Policy Reader Chatbot is a Retrieval-Augmented Generation (RAG) based document question-answering system.
 
-- FastAPI for high-performance API development
-- Automatic interactive API documentation with Swagger UI
-- Built-in support for async operations
-- Easy integration with databases (e.g., SQLAlchemy)
-- Pydantic for data validation
-- CORS support for cross-origin requests
+It allows users to:
 
-## Installation
+- Upload documents (PDF, DOCX, TXT)
+- Process and index document content
+- Ask natural language questions
+- Receive accurate answers generated using Google Gemini AI
 
-1. Create a virtual environment:
+The system combines document retrieval with AI-powered answer generation to ensure responses are based strictly on uploaded document content.
 
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+---
 
-2. Install dependencies:
-   ```bash
-   poetry install
-   ```
+## How the System Works
 
-## Usage
+1. A user uploads a document.
+2. The system extracts text from the document.
+3. The text is split into smaller chunks.
+4. Each chunk is converted into vector embeddings.
+5. The embeddings are stored in a FAISS vector database.
+6. When a user asks a question:
+   - The system converts the question into an embedding.
+   - It finds the most relevant document chunks.
+   - Those chunks are sent to Gemini AI.
+   - Gemini generates an answer using only the retrieved context.
 
-1. Run the development server:
+This approach ensures answers are accurate and grounded in the document.
 
-   ```bash
-   uvicorn src.app:app --reload
-   ```
+---
 
-2. Open your browser and navigate to `http://127.0.0.1:8000/docs` for interactive API documentation.
+## Technology Used
+
+- FastAPI — Backend REST API
+- Streamlit — Frontend user interface
+- SQLAlchemy — Database ORM
+- SQLite (local) / PostgreSQL (production)
+- FAISS — Vector similarity search
+- Sentence Transformers — Text embeddings
+- Google Gemini AI — Answer generation
+- PyPDF2 & python-docx — Document parsing
+
+---
+
+## How to Set Up Locally
+
+### Prerequisites
+
+- Python 3.10 to 3.12
+- Google Gemini API Key (Get it from https://makersuite.google.com/app/apikey)
+- Git installed
+
+---
+
+## Cone the Repository
+
+```bash
+git clone <repository-url>
+cd policy_reader_chatbot/fastapi
+
+# Local Setup Guide (Poetry)
+
+This guide explains how to set up and run the project locally using
+**Poetry**.
+
+------------------------------------------------------------------------
+
+## Prerequisites
+
+-   Python 3.10 -- 3.12
+-   Poetry installed
+-   Git installed
+
+------------------------------------------------------------------------
+
+## Install Poetry (If Not Installed)
+
+### Windows (PowerShell)
+
+``` bash
+(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
+```
+
+### macOS / Linux
+
+``` bash
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+Verify installation:
+
+``` bash
+poetry --version
+```
+
+------------------------------------------------------------------------
+
+## Clone the Repository
+
+``` bash
+git clone <repository-url>
+cd policy_reader_chatbot/fastapi
+```
+
+------------------------------------------------------------------------
+
+## Install Dependencies
+
+``` bash
+poetry install
+```
+
+This will create a virtual environment and install all required
+dependencies from `pyproject.toml`.
+
+------------------------------------------------------------------------
+
+## Activate Virtual Environment
+
+``` bash
+poetry shell
+```
+
+Alternatively, you can run commands without activating:
+
+``` bash
+poetry run <command>
+```
+
+------------------------------------------------------------------------
+
+## Run Database Migrations
+
+``` bash
+poetry run alembic upgrade head
+```
+
+------------------------------------------------------------------------
+
+## Start Backend Server
+
+``` bash
+poetry run python main.py
+```
+
+Backend URL:
+
+    http://localhost:8000
+
+API Docs:
+
+    http://localhost:8000/docs
+
+------------------------------------------------------------------------
+
+## Start Frontend (Streamlit)
+
+Open a new terminal in the project root:
+
+``` bash
+cd streamlit_app
+poetry run streamlit run app.py
+```
+
+Frontend URL:
+
+    http://localhost:8501
+
+------------------------------------------------------------------------
+
+## Common Useful Commands
+
+Update dependencies:
+
+``` bash
+poetry update
+```
+
+Add new dependency:
+
+``` bash
+poetry add package_name
+```
+
+Deactivate virtual environment:
+
+``` bash
+exit
+```

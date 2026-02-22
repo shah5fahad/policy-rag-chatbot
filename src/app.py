@@ -26,7 +26,29 @@ def run_upgrade(connection, alembic_config: Config):
     command.upgrade(alembic_config, "head")
 
 
+def ensure_sqlite_directory():
+    database_uri = os.getenv("SQLALCHEMY_DATABASE_URI")
+
+    if not database_uri:
+        raise ValueError("SQLALCHEMY_DATABASE_URI is not set")
+
+    # Handle only SQLite
+    if database_uri.startswith("sqlite"):
+        # Remove sqlite driver prefix
+        # Example:
+        # sqlite+aiosqlite:///database/app_db/app.db
+        db_path = database_uri.split("///")[-1]
+
+        # Get directory path
+        db_directory = os.path.dirname(db_path)
+
+        if db_directory:
+            os.makedirs(db_directory, exist_ok=True)
+            print(f"✅ Database directory ensured: {db_directory}")
+
+
 async def run_migrations():
+    ensure_sqlite_directory()
     logger.info("Running migrations if any...")
     alembic_config = Config("alembic.ini")
     alembic_config.set_main_option(
@@ -67,7 +89,7 @@ app.add_middleware(
 )
 
 
-@app.get("/api/")
+@app.get("/api/v1/health")
 async def check_health():
     return {"response": "Service is healthy!"}
 

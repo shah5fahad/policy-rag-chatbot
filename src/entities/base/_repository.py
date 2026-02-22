@@ -12,6 +12,7 @@ from sqlalchemy import (
     asc,
     desc,
     func,
+    text,
 )
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.future import select
@@ -77,10 +78,20 @@ class BaseRepository:
 
     async def create(self, object: ModelT):
         async with self.get_session() as session:
-            session.add(object)
-            await session.commit()
-            await session.refresh(object)
-            return object
+            try:
+                session.add(object)
+                await session.flush()
+                # For SQLite, get the last inserted row ID
+                if hasattr(object, 'id') and object.id is None:
+                    # SQLite-specific: Use last_insert_rowid()
+                    result = await session.execute(
+                        text("SELECT last_insert_rowid()")
+                    )
+                    object.id = result.scalar()
+                await session.commit()
+                return object
+            except Exception as e:
+                raise
 
     async def list(
         self,
