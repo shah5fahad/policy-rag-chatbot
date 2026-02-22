@@ -56,12 +56,6 @@ This approach ensures answers are accurate and grounded in the document.
 
 ---
 
-## Cone the Repository
-
-```bash
-git clone <repository-url>
-cd policy_reader_chatbot/fastapi
-
 # Local Setup Guide (Poetry)
 
 This guide explains how to set up and run the project locally using
@@ -102,8 +96,7 @@ poetry --version
 ## Clone the Repository
 
 ``` bash
-git clone <repository-url>
-cd policy_reader_chatbot/fastapi
+git clone https://github.com/shah5fahad/policy-rag-chatbot
 ```
 
 ------------------------------------------------------------------------
