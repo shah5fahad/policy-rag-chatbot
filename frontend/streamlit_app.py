@@ -1,18 +1,20 @@
 # ui/streamlit_app.py
 
 import streamlit as st
-import requests
+import requests, os
 import pandas as pd
 from datetime import datetime
 from typing import Optional, Dict, Any
 from PIL import Image
-import time
+from zoneinfo import ZoneInfo
+from dotenv import load_dotenv
+load_dotenv()  # Load environment variables from .env file
 
 # ==========================================================
 # CONFIG
 # ==========================================================
 
-API_BASE_URL = "http://localhost:8000/api/v1"
+API_BASE_URL = f"{os.getenv('API_BASE_URL', 'http://localhost:8000')}/api/v1"
 
 st.set_page_config(
     page_title="Document Parser AI",
@@ -50,15 +52,29 @@ def ensure_list(data):
 def safe_str(value):
     return str(value) if value is not None else ""
 
-def format_date(date_str: Optional[str]) -> str:
-    if not date_str:
+def format_date(date_value: Optional[object]) -> str:
+    if not date_value:
         return "N/A"
 
     try:
-        # Try parsing ISO format first
-        dt = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
-        return dt.strftime("%B %d, %Y %I:%M %p")
-    except ValueError:
+        # Convert to datetime
+        if isinstance(date_value, datetime):
+            dt = date_value
+        else:
+            dt = datetime.fromisoformat(str(date_value).replace("Z", "+00:00"))
+
+        # If datetime is naive, assume UTC
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=ZoneInfo("UTC"))
+
+        # Convert to IST
+        IST = ZoneInfo("Asia/Kolkata")
+        dt_ist = dt.astimezone(IST)
+
+        # Indian readable format in IST
+        return dt_ist.strftime("%d %B %Y, %I:%M %p")
+
+    except Exception:
         return "Invalid Date"
 
 def format_file_size(size_bytes: Optional[int]) -> str:
