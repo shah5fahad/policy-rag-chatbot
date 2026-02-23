@@ -28,7 +28,7 @@ DEFAULT_STATES = {
     "current_page": "Dashboard",
     "selected_document": None,
     "api_error": None,
-    "last_refresh": datetime.now(),
+    "last_refresh": datetime.now().strftime("%B %d, %Y %I:%M %p"),
     "db_initialized": True,
 }
 
@@ -53,7 +53,13 @@ def safe_str(value):
 def format_date(date_str: Optional[str]) -> str:
     if not date_str:
         return "N/A"
-    return safe_str(date_str)[:19]
+
+    try:
+        # Try parsing ISO format first
+        dt = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+        return dt.strftime("%B %d, %Y %I:%M %p")
+    except ValueError:
+        return "Invalid Date"
 
 def format_file_size(size_bytes: Optional[int]) -> str:
     if not size_bytes:
@@ -140,7 +146,7 @@ st.session_state.current_page = PAGE_MAP[selected]
 st.sidebar.caption(f"Last Refresh: {st.session_state.last_refresh}")
 
 if st.sidebar.button("🔄 Refresh"):
-    st.session_state.last_refresh = datetime.now()
+    st.session_state.last_refresh = datetime.now().strftime("%B %d, %Y %I:%M %p")
     st.cache_data.clear()
     st.rerun()
 
