@@ -19,8 +19,7 @@ async def run_test_rag_service():
     3. Print the answer
     """
     rag = RAGService(
-        collection_name="books",
-        provider=AIModelProvider.GEMINI,
+        collection_name="books"
     )
 
     # Index documents

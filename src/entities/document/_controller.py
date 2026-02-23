@@ -127,8 +127,7 @@ class DocumentController(BaseController):
         try:
             # Initialize services
             rag_service = RAGService(
-                collection_name=os.getenv("VECTOR_COLLECTION_NAME", "documents"),
-                provider=AIModelProvider.GEMINI  # or from settings
+                collection_name=os.getenv("VECTOR_COLLECTION_NAME", "documents")
             )
             processing_service = DocumentProcessingService(rag_service)
             
@@ -170,8 +169,7 @@ class DocumentController(BaseController):
         try:
             # Initialize RAG service
             rag_service = RAGService(
-                collection_name=os.getenv("VECTOR_COLLECTION_NAME", "documents"),
-                provider=AIModelProvider.GEMINI
+                collection_name=os.getenv("VECTOR_COLLECTION_NAME", "documents")
             )
             
             # Query

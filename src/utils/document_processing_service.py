@@ -16,8 +16,7 @@ class DocumentProcessingService:
     
     def __init__(self, rag_service: Optional[RAGService] = None):
         self.rag_service = rag_service or RAGService(
-            collection_name=os.getenv("VECTOR_COLLECTION_NAME", "documents"),
-            provider=AIModelProvider.GEMINI
+            collection_name=os.getenv("VECTOR_COLLECTION_NAME", "documents")
         )
         self.document_service = DocumentService()
         self.parser_factory = ParserFactory()

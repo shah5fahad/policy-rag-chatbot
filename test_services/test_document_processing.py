@@ -29,8 +29,7 @@ async def test_document_processing():
     
     # Initialize processing service
     rag_service = RAGService(
-        collection_name="test_docs",
-        provider=AIModelProvider.GEMINI
+        collection_name="test_docs"
     )
     processor = DocumentProcessingService(rag_service)
     
