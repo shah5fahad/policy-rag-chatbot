@@ -1,312 +1,44 @@
 [project]
-name = "backend"
+name = "policy-rag-chatbot"
 version = "0.1.0"
 description = "Industrial-grade Book AI Platform with RAG, Chapter Summaries, Quiz Generation, and Chatbot"
 authors = [
-    { name = "Fahad Ansari", email = "fahad.ansari@sifars.com" }
+    {name = "Fahad",email = "shahf8604@gmail.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
 dependencies = [
-    # Web Framework
-    "fastapi>=0.116.1",
-    "uvicorn[standard]>=0.41.0",
-    "starlette>=0.47.3",
-    "httpx>=0.28.1",
-    "requests>=2.32.5",
-    "aiohttp>=3.13.3",
-    
-    # Database
-    "sqlalchemy>=2.0.43",
-    "alembic>=1.16.5",
-    "aiosqlite>=0.21.0",
-    "asyncpg>=0.31.0",
-    "pgvector>=0.4.2",
-    
-    # AI/LLM Providers
-    "openai>=2.21.0",
-    "anthropic>=0.83.0",
-    "google-genai>=1.64.0",
-    "groq>=1.0.0",
-    "cohere>=5.20.6",
-    "mistralai>=1.12.4",
-    "xai-sdk>=1.7.0",
-    "ollama>=0.6.1",
-    
-    # Pydantic AI
-    "pydantic>=2.12.5",
-    "pydantic-ai>=1.62.0",
-    "pydantic-ai-slim>=1.62.0",
-    "pydantic-core>=2.41.5",
-    "pydantic-settings>=2.13.1",
-    "pydantic-graph>=1.62.0",
-    "pydantic-evals>=1.62.0",
-    "pydantic-extra-types>=2.11.0",
-    
-    # Vector Stores & Embeddings
-    "chromadb>=0.6.3",
-    "faiss-cpu>=1.13.2",
-    "qdrant-client>=1.17.0",
-    "sentence-transformers>=5.2.3",
-    "transformers>=5.2.0",
-    "tokenizers>=0.22.2",
-    "safetensors>=0.7.0",
-    
-    # Document Processing
-    "python-docx>=1.2.0",
-    "pypdf2>=3.0.1",
-    "pypdf>=4.3.1",
-    "markdown>=3.10.2",
-    "beautifulsoup4>=4.14.3",
-    "python-multipart>=0.0.22",
-    "pillow>=12.1.1",
-    "pytesseract>=0.3.13",
-    "tesseract>=0.1.3",
-    "lxml>=6.0.2",
-    
-    # Data Science & ML
-    "numpy>=2.2.6",
-    "pandas>=2.3.3",
-    "scikit-learn>=1.8.0",
-    "scipy>=1.17.0",
-    "torch>=2.8.0",
-    "torchvision>=0.23.0",
-    "torchaudio>=2.8.0",
-    "accelerate>=0.34.2",
-    "sentencepiece>=0.2.1",
-    "joblib>=1.5.3",
-    "threadpoolctl>=3.6.0",
-    "tqdm>=4.67.3",
-    "networkx>=3.6.1",
-    "sympy>=1.14.0",
-    "mpmath>=1.3.0",
-    
-    # LLM Serving & Optimization
-    "vllm>=0.11.0",
-    "ray>=2.54.0",
-    "outlines-core>=0.2.11",
-    "lm-format-enforcer>=0.11.3",
-    "compressed-tensors>=0.11.0",
-    
-    # Streamlit & UI
-    "streamlit>=1.54.0",
-    "altair>=6.0.0",
-    "pydeck>=0.9.1",
-    "jinja2>=3.1.6",
-    "markupsafe>=3.0.2",
-    "blinker>=1.9.0",
-    "watchdog>=6.0.0",
-    "pyarrow>=23.0.1",
-    
-    # AWS & Cloud
-    "boto3>=1.42.54",
-    "botocore>=1.42.54",
-    "s3transfer>=0.16.0",
-    "jmespath>=1.1.0",
-    
-    # Authentication & Security
-    "cryptography>=46.0.5",
-    "pyjwt>=2.11.0",
-    "oauthlib>=3.3.1",
-    "requests-oauthlib>=2.0.0",
-    "authlib>=1.6.8",
-    "bcrypt>=5.0.0",
-    "passlib>=1.7.4",
-    
-    # Monitoring & Observability
-    "loguru>=0.7.3",
-    "opentelemetry-api>=1.39.1",
-    "opentelemetry-sdk>=1.39.1",
-    "opentelemetry-instrumentation-fastapi>=0.60b1",
-    "opentelemetry-exporter-otlp-proto-grpc>=1.39.1",
-    "prometheus-fastapi-instrumentator>=7.1.0",
-    "sentry-sdk>=2.53.0",
-    "logfire>=4.25.0",
-    "posthog>=7.9.3",
-    
-    # Utilities
-    "python-dotenv>=1.1.1",
-    "tenacity>=8.5.0",
-    "typing-extensions>=4.15.0",
-    "typing-inspection>=0.4.2",
-    "pydantic-settings>=2.13.1",
-    "python-dateutil>=2.9.0",
-    "pytz>=2025.2",
-    "tzdata>=2025.3",
-    "cachetools>=6.2.6",
-    "distro>=1.9.0",
-    "certifi>=2026.1.4",
-    "charset-normalizer>=3.4.4",
-    "idna>=3.10",
-    "urllib3>=2.6.3",
-    "pyyaml>=6.0.3",
-    "toml>=0.10.2",
-    "jsonschema>=4.26.0",
-    "referencing>=0.37.0",
-    "rpds-py>=0.30.0",
-    "wrapt>=1.17.3",
-    "greenlet>=3.2.4",
-    
-    # Async & Performance
-    "asgiref>=3.11.1",
-    "anyio>=4.10.0",
-    "sniffio>=1.3.1",
-    "watchfiles>=1.1.1",
-    "httptools>=0.7.1",
-    "websockets>=15.0.1",
-    "aiofiles>=24.1.0",
-    "multidict>=6.7.1",
-    "yarl>=1.22.0",
-    "frozenlist>=1.8.0",
-    "aiosignal>=1.4.0",
-    "propcache>=0.4.1",
-    "h11>=0.16.0",
-    "httpcore>=1.0.9",
-    
-    # MCP & AI Tools
-    "mcp>=1.26.0",
-    "fastmcp>=3.0.1",
-    "genai-prices>=0.0.54",
-    "docstring-parser>=0.17.0",
-    "eval-type-backport>=0.3.1",
-    "annotated-types>=0.7.0",
-    
-    # Serialization
-    "orjson>=3.11.7",
-    "msgspec>=0.20.0",
-    "msgpack>=1.1.2",
-    "protobuf>=6.33.5",
-    "flatbuffers>=25.12.19",
-    "fastavro>=1.12.1",
-    "cbor2>=5.8.0",
-    "pybase64>=1.4.3",
-    
-    # Git & Version Control
-    "gitpython>=3.1.46",
-    "gitdb>=4.0.12",
-    "smmap>=5.0.2",
-    
-    # System
-    "psutil>=7.2.2",
-    "pywin32>=311 ; platform_system == 'Windows'",
-    "pywin32-ctypes>=0.2.3 ; platform_system == 'Windows'",
-    "setproctitle>=1.3.7",
-    
-    # Testing & Development
-    "pytest>=8.4.2",
-    "pytest-asyncio>=0.26.0",
-    "pytest-cov>=4.1.0",
-    "black>=23.12.1",
-    "mypy>=1.19.1",
-    "isort>=5.13.2",
-    "ruff>=0.3.7",
-    "coverage>=7.13.4",
-    "pyproject-hooks>=1.2.0",
-    "build>=1.4.0",
+    "fastapi (>=0.116.1)",
+    "uvicorn[standard] (>=0.41.0)",
+    "requests (>=2.32.5)",
+    "sqlalchemy (>=2.0.43)",
+    "alembic (>=1.16.5)",
+    "aiosqlite (>=0.21.0)",
+    "pydantic (>=2.12.5)",
+    "pydantic-ai (>=1.62.0)",
+    "pydantic (>=2.12.5)",
+    "pydantic-ai (>=1.62.0)",
+    "pydantic-ai-slim (>=1.62.0)",
+    "pydantic-core (>=2.41.5)",
+    "pydantic-settings (>=2.13.1)",
+    "pydantic-graph (>=1.62.0)",
+    "pydantic-evals (>=1.62.0)",
+    "pydantic-extra-types (>=2.11.0)",
+    "faiss-cpu (>=1.13.2)",
+    "sentence-transformers (>=5.2.3)",
+    "pypdf2 (>=3.0.1)",
+    "pytesseract (>=0.3.13)",
+    "numpy (>=2.2.6)",
+    "pandas (>=2.3.3)",
+    "streamlit (>=1.54.0)",
+    "loguru (>=0.7.3)",
+    "python-dotenv (>=1.1.1)",
+    "python-docx (>=1.2.0)"
 ]
-
-[project.optional-dependencies]
-# Vector stores
-chroma = [
-    "chromadb>=0.6.3",
-]
-faiss = [
-    "faiss-cpu>=1.13.2",
-]
-qdrant = [
-    "qdrant-client>=1.17.0",
-]
-pgvector = [
-    "asyncpg>=0.31.0",
-    "pgvector>=0.4.2",
-]
-
-# HuggingFace & Transformers
-huggingface = [
-    "transformers>=5.2.0",
-    "torch>=2.8.0",
-    "sentence-transformers>=5.2.3",
-    "accelerate>=0.34.2",
-    "tokenizers>=0.22.2",
-    "safetensors>=0.7.0",
-    "datasets>=3.5.0",
-    "evaluate>=0.4.3",
-]
-huggingface-remote = [
-    "huggingface-hub>=1.4.1",
-    "hf-xet>=1.2.0",
-]
-
-# LLM serving
-vllm = [
-    "vllm>=0.11.0",
-    "ray>=2.54.0",
-]
-ollama = [
-    "ollama>=0.6.1",
-]
-
-# Development
-dev = [
-    "pytest>=8.4.2",
-    "pytest-asyncio>=0.26.0",
-    "pytest-cov>=4.1.0",
-    "black>=23.12.1",
-    "mypy>=1.19.1",
-    "isort>=5.13.2",
-    "ruff>=0.3.7",
-    "pre-commit>=4.2.0",
-    "build>=1.4.0",
-    "pyproject-hooks>=1.2.0",
-    "coverage>=7.13.4",
-    "ipython>=8.34.0",
-]
-
-# All extras
-all = [
-    "chromadb>=0.6.3",
-    "faiss-cpu>=1.13.2",
-    "qdrant-client>=1.17.0",
-    "transformers>=5.2.0",
-    "torch>=2.8.0",
-    "sentence-transformers>=5.2.3",
-    "accelerate>=0.34.2",
-    "huggingface-hub>=1.4.1",
-    "vllm>=0.11.0",
-    "ray>=2.54.0",
-    "ollama>=0.6.1",
-]
-
-[build-system]
-requires = ["poetry-core>=2.0.0"]
-build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 package-mode = false
 
-[tool.pytest.ini_options]
-minversion = "7.0"
-addopts = "-ra -q --asyncio-mode=auto"
-testpaths = ["tests"]
-
-[tool.mypy]
-python_version = "3.11"
-warn_return_any = true
-warn_unused_configs = true
-ignore_missing_imports = true
-
-[tool.ruff]
-line-length = 100
-target-version = "py311"
-
-[tool.ruff.lint]
-select = ["E", "F", "I", "B", "C4", "ARG", "SIM"]
-ignore = ["B008", "C408"]
-
-[tool.isort]
-profile = "black"
-line_length = 100
-
-[tool.black]
-line-length = 100
-target-version = ['py311']
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
