@@ -174,7 +174,7 @@ class DocumentController(BaseController):
             
             # Query
             result = await rag_service.query(question)
-            print(f"RAG Query Result: {result} {question}")  # Debug log
+
             return {
                 "status": "success",
                 "question": question,
