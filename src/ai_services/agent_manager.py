@@ -23,7 +23,7 @@ class AgentManager:
     - Cancellation safety
     """
 
-    DEFAULT_RETRIES = 5
+    DEFAULT_RETRIES = 3
     MAX_BACKOFF = 60.0
     BASE_DELAY = 1.0
     DEFAULT_TIMEOUT = 120.0
